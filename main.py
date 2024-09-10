@@ -1,4 +1,4 @@
-from PyPDF2 import PdfFileWriter, PdfFileReader
+from PyPDF2 import PdfWriter, PdfReader
 import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
@@ -30,8 +30,8 @@ with open('names.txt', 'r') as fd:
 pages = math.ceil(len(names) / max_names_per_page)
 
 # Load existing PDF (template PDF)
-existing_pdf = PdfFileReader(open("original.pdf", "rb"))
-output = PdfFileWriter()
+existing_pdf = PdfReader(open("original.pdf", "rb"))
+output = PdfWriter()
 
 for page_num in range(pages):
     print(f"Processing page {page_num + 1}")
@@ -63,14 +63,14 @@ for page_num in range(pages):
     # Save the canvas and add it to the new page
     can.save()
     packet.seek(0)
-    new_pdf = PdfFileReader(packet)
+    new_pdf = PdfReader(packet)
 
     # Create a fresh copy of the template page to avoid modifying the original
-    template_page = copy.copy(existing_pdf.getPage(0))
+    template_page = copy.copy(existing_pdf.pages[0])
 
     # Merge new content with the fresh copy of the template page
-    template_page.mergePage(new_pdf.getPage(0))
-    output.addPage(template_page)
+    template_page.merge_page(new_pdf.pages[0])
+    output.add_page(template_page)
 
 # Save the final output PDF
 outputStream = open(f"namesToPrint_{pages}.pdf", "wb")
